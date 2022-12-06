@@ -27,13 +27,13 @@ class AVLNode(object):
             self.height = -1
             self.size = 0
             return
-        if Node.virtual_node is None:
-            Node.virtual_node = AVLNode("virtual", True)
+        if AVLNode.virtual_node is None:
+            AVLNode.virtual_node = AVLNode("virtual", True)
         self.value = value
         self.is_virtual = False
-        self.left = Node.virutal_node
-        self.right = Node.virutal_node
-        self.parent = Node.virutal_node
+        self.left = AVLNode.virtual_node
+        self.right = AVLNode.virtual_node
+        self.parent = AVLNode.virtual_node
         self.height = 0  # Balance factor
         self.size = 1
 
@@ -43,7 +43,7 @@ class AVLNode(object):
 	"""
 
     def getLeft(self):
-        if self.left is Node.virutal_node:
+        if self.left is AVLNode.virtual_node:
             return None
         return self.left
 
@@ -54,7 +54,7 @@ class AVLNode(object):
 	"""
 
     def getRight(self):
-        if self.right is Node.virutal_node:
+        if self.right is AVLNode.virtual_node:
             return None
         return self.right
 
@@ -65,7 +65,7 @@ class AVLNode(object):
 	"""
 
     def getParent(self):
-        if self.parent is Node.virutal_node:
+        if self.parent is AVLNode.virtual_node:
             return None
         return self.parent
 
@@ -76,7 +76,7 @@ class AVLNode(object):
 	"""
 
     def getValue(self):
-        if self is Node.virutal_node:
+        if self is AVLNode.virtual_node:
             return None
         return self.value
 
@@ -116,9 +116,6 @@ class AVLNode(object):
     def setParent(self, node):
         self.parent = node
 
-    def update_attribute(self):
-        self.size = self.left.size + self.right.size + 1
-        self.height = 1 + max(self.right.height + self.left.height)
 
     """sets value
 
@@ -147,7 +144,7 @@ class AVLNode(object):
 	"""
 
     def isRealNode(self):
-        return not (self is Node.virutal_node)
+        return not (self is AVLNode.virtual_node)
 
 
 """
