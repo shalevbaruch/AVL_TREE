@@ -255,7 +255,7 @@ class AVLTreeList(object):
 		if y.left.isRealNode:
 			y.left.parent = x
 		y.parent = x.parent
-		if x.getParent() is None:
+		if x.parent().isRealNode == False:
 			self.root = y
 
 		elif x == x.parent.left:
@@ -276,7 +276,7 @@ class AVLTreeList(object):
 			y.right.parent = x
 
 		y.parent = x.parent
-		if x.getParent() is None:
+		if x.parent().isRealNode == False:
 			self.root = y
 
 		elif x == x.parent.right:
