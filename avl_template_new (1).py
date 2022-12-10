@@ -15,10 +15,8 @@ import random
 
 class AVLNode(object):
 	"""Constructor, you are allowed to add more fields.
-
 	@type value: str
 	@param value: data of your node
-
 	"""
 	virtual_node = None
 
@@ -209,8 +207,7 @@ A class implementing the ADT list, using an AVL tree.
 class AVLTreeList(object):
 
 	"""
-	Constructor, you are allowed to add more fields.  
-
+	Constructor, you are allowed to add more fields.
 	"""
 	def __init__(self):    ##possibly has to be fixed
 		self.size = 0
@@ -219,7 +216,6 @@ class AVLTreeList(object):
 
 
 	"""returns whether the list is empty
-
 	@rtype: bool
 	@returns: True if the list is empty, False otherwise
 	"""
@@ -228,7 +224,6 @@ class AVLTreeList(object):
 
 
 	"""retrieves the value of the i'th item in the list
-
 	@type i: int
 	@pre: 0 <= i < self.length()
 	@param i: index in the list
@@ -240,7 +235,6 @@ class AVLTreeList(object):
 
 
 	"""inserts val at position i in the list
-
 	@type i: int
 	@pre: 0 <= i <= self.length()
 	@param i: The intended index in the list to which we insert val
@@ -252,10 +246,10 @@ class AVLTreeList(object):
 	def left_rotate(self, x: AVLNode):
 		y = x.right
 		x.right = y.left
-		if y.left.isRealNode:
+		if y.getLeft() is not None:
 			y.left.parent = x
 		y.parent = x.parent
-		if x.parent().isRealNode == False:
+		if x.getParent() is None:
 			self.root = y
 
 		elif x == x.parent.left:
@@ -272,11 +266,11 @@ class AVLTreeList(object):
 	def right_rotate(self, x: AVLNode):
 		y = x.left
 		x.left = y.right
-		if y.right.isRealNode():
+		if y.getRight() is not None:
 			y.right.parent = x
 
 		y.parent = x.parent
-		if x.parent().isRealNode == False:
+		if x.getParent() is None:
 			self.root = y
 
 		elif x == x.parent.right:
@@ -421,7 +415,6 @@ class AVLTreeList(object):
 
 
 	"""deletes the i'th item in the list
-
 	@type i: int
 	@pre: 0 <= i < self.length()
 	@param i: The intended index in the list to be deleted
@@ -476,7 +469,6 @@ class AVLTreeList(object):
 
 
 	"""returns the value of the first item in the list
-
 	@rtype: str
 	@returns: the value of the first item, None if the list is empty
 	"""
@@ -487,7 +479,6 @@ class AVLTreeList(object):
 			return self.root.min().getValue()
 
 	"""returns the value of the last item in the list
-
 	@rtype: str
 	@returns: the value of the last item, None if the list is empty
 	"""
@@ -498,7 +489,6 @@ class AVLTreeList(object):
 			return self.root.Max().getValue()
 
 	"""returns an array representing list 
-
 	@rtype: list
 	@returns: a list of strings representing the data structure
 	"""
@@ -509,7 +499,6 @@ class AVLTreeList(object):
 		return arr
 
 	"""returns the size of the list 
-
 	@rtype: int
 	@returns: the size of the list
 	"""
@@ -517,15 +506,22 @@ class AVLTreeList(object):
 		return self.size
 
 	"""sort the info values of the list
-
 	@rtype: list
 	@returns: an AVLTreeList where the values are sorted by the info of the original list.
 	"""
 	def sort(self):
-		return None
+		arr = self.listToArray()
+		tree2 = AVLTreeList()
+		arr.sort()
+		i=0
+		for string in arr:
+			tree2.insert(i,string)
+			i+=1
+		return tree2
+
+
 
 	"""permute the info values of the list 
-
 	@rtype: list
 	@returns: an AVLTreeList where the values are permuted randomly by the info of the original list. ##Use Randomness
 	"""
@@ -541,7 +537,6 @@ class AVLTreeList(object):
 		return tree2
 
 	"""concatenates lst to self
-
 	@type lst: AVLTreeList
 	@param lst: a list to be concatenated after self
 	@rtype: int
@@ -551,7 +546,6 @@ class AVLTreeList(object):
 		return None
 
 	"""searches for a *value* in the list
-
 	@type val: str
 	@param val: a value to be searched
 	@rtype: int
@@ -562,13 +556,13 @@ class AVLTreeList(object):
 		for i in range(0,self.size):
 			if self.retrieve(i) == val:
 				index = i
+				return index
 		return index
 
 
 
 
 	"""returns the root of the tree representing the list
-
 	@rtype: AVLNode
 	@returns: the root, None if the list is empty
 	"""
@@ -577,6 +571,6 @@ class AVLTreeList(object):
 
 	def inorder(self, Root: AVLNode):
 		if Root.isRealNode():
-			self.inorder(Root.left.getValue())
+			self.inorder(Root.left)
 			print(Root.getValue())
-			self.inorder(Root.right.getValue())
+			self.inorder(Root.right)
