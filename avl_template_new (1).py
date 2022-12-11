@@ -139,8 +139,10 @@ class AVLNode(object):
 		return not (self is AVLNode.virtual_node)
 
 	def getSize(self):
+		if self.isRealNode()==False:
+			return 0
 		return self.size
-	def setSize(self,s):   ##possibly has to be fixed
+	def setSize(self,s):
 		self.size = s
 	def get_BF(self):
 		if self.isRealNode()==False:
@@ -170,7 +172,7 @@ class AVLNode(object):
 		return temp
 
 	def predecessor(self):
-		if self.getLeft().isRealNode():
+		if self.getLeft() is not None:
 			pred = self.left.Max()
 		else:
 			temp = self
@@ -180,7 +182,7 @@ class AVLNode(object):
 				pred = temp.parent
 		return pred
 	def successor(self):
-		if self.getRight().isRealNode():
+		if self.getRight() is not None:
 			succ = self.right.min()
 		else:
 			temp = self
@@ -434,7 +436,7 @@ class AVLTreeList(object):
 			##node.right.recalculate_node_attributes()
 			##self.size -= 1
 			##if node.right.isRealNode():
-			if node.getRight is None:
+			if node.getRight() is None:
 				cnt += self.Fix_Up_Delete(node.right)
 
 		##elif node.right.isRealNode()== False:
@@ -494,8 +496,10 @@ class AVLTreeList(object):
 	"""
 	def listToArray(self):
 		arr = [None for i in range(self.size)]
+		Min = self.root.min()
 		for j in range(self.size):
-			arr[j] = self.retrieve(j)
+			arr[j] = Min.getValue()
+			Min = Min.successor()
 		return arr
 
 	"""returns the size of the list 
@@ -511,13 +515,14 @@ class AVLTreeList(object):
 	"""
 	def sort(self):
 		arr = self.listToArray()
-		tree2 = AVLTreeList()
 		arr.sort()
 		i=0
+		Min = self.root.min()
 		for string in arr:
-			tree2.insert(i,string)
+			Min.value = arr[i]
+			Min = Min.successor()
 			i+=1
-		return tree2
+		return self
 
 
 
@@ -526,15 +531,13 @@ class AVLTreeList(object):
 	@returns: an AVLTreeList where the values are permuted randomly by the info of the original list. ##Use Randomness
 	"""
 	def permutation(self):
-		tree2 = AVLTreeList()
-		temp = list(i for i in range(0,self.size))
+		temp = self.listToArray()
+		random.shuffle(temp)
+		Min = self.root.min()
 		for j in range(self.size):
-			num = random.choice(temp)
-			temp.remove(num)
-			mystring = self.retrieve(num)
-			tree2.insert(j, mystring)
-
-		return tree2
+			Min.value = temp[j]
+			Min = Min.successor()
+		return self
 
 	"""concatenates lst to self
 	@type lst: AVLTreeList
@@ -552,11 +555,13 @@ class AVLTreeList(object):
 	@returns: the first index that contains val, -1 if not found.
 	"""
 	def search(self, val):
+		Min = self.root.min()
 		index = -1
-		for i in range(0,self.size):
-			if self.retrieve(i) == val:
+		for i in range(self.size):
+			if Min.getValue() == val:
 				index = i
 				return index
+			Min = Min.successor()
 		return index
 
 
@@ -574,3 +579,31 @@ class AVLTreeList(object):
 			self.inorder(Root.left)
 			print(Root.getValue())
 			self.inorder(Root.right)
+
+
+
+tree = AVLTreeList()
+arr = ["a","b", "c" , "d" , "e" , "f" , "g", "h"]
+for i in range(8):
+	tree.insert(i,arr[i])
+
+
+
+
+##print(tree.search("D"))
+##cnt = tree.insert(3,"F")
+##print(tree.delete(3))
+##print(tree.insert(4,"A"))
+##print(tree.delete(4))
+##tree.inorder(tree.getRoot())
+##tree.inorder(tree.permutation().getRoot())
+##print(cnt)
+##print (tree.retrieve(1))
+
+##print(tree.search("A"))
+##tree.insert(0,"C")
+##tree.inorder(tree.getRoot())
+##tree.delete(0)
+##tree.inorder(tree.sort().getRoot())
+
+
