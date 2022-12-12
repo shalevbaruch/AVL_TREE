@@ -211,9 +211,11 @@ class AVLTreeList(object):
 	"""
 	Constructor, you are allowed to add more fields.
 	"""
-	def __init__(self):    ##possibly has to be fixed
+	def __init__(self):
 		self.size = 0
 		self.root = AVLNode(None)
+		self.MIN = AVLNode(None)
+		self.MAX = AVLNode(None)
 		# add your fields here
 
 
@@ -233,6 +235,8 @@ class AVLTreeList(object):
 	@returns: the the value of the i'th item in the list
 	"""
 	def retrieve(self, i):
+		if (i>=self.length()):
+			return -1
 		return self.root.get_node_index(i+1).getValue()
 
 
@@ -288,39 +292,42 @@ class AVLTreeList(object):
 		y.recalculate_node_attributes()
 
 	def insert(self, i, val):
+		if (i>=self.size+1):
+			return -1
 		cnt=0
 		node = AVLNode(val)
 		if (i==self.size and self.empty()==False):
 			temp1 = self.root.Max()
 			temp1.setRight(node)
 			node.setParent(temp1)
+			self.MAX = node
 			par = temp1
 
 		elif self.empty() and i ==self.size:
 			self.root = node
-			##self.root.setParent(AVLNode.virtual_node)
+			self.MAX = node
+			self.MIN = node
 			par = AVLNode.virtual_node
 
 		else:
 			index_node = self.root.get_node_index(i+1)
-			##if index_node.getLeft().isRealNode()==False:
 			if index_node.getLeft() is None:
 				index_node.setLeft(node)
 				node.setParent(index_node)
 				par = index_node
+				if (i==0):
+					self.MIN = node
 			else:
 				pred = index_node.predecessor()
 				pred.setRight(node)
 				node.setParent(pred)
 				par = pred
-		##if node.parent.isRealNode()==False:
 		if node.getParent() is None:
 			self.root = node;
 		temp = node
 		self.size += 1
 		while(par.isRealNode()):
 			par.recalculate_node_attributes()
-			##par.height = 1+max(par.left.getHeight(),par.right.getHeight())
 			grand = par.parent
 			if grand.get_BF()>=2 or grand.get_BF()<=-2:
 				if par == grand.left:
@@ -343,7 +350,6 @@ class AVLTreeList(object):
 						self.right_rotate(par)
 						self.left_rotate(grand)
 						cnt+=2
-				##break we dont stop because we need to update size anyway
 			par = par.parent
 			temp = temp.parent
 		return cnt
@@ -426,6 +432,10 @@ class AVLTreeList(object):
 	def delete(self, i):
 		cnt=0
 		node = self.root.get_node_index(i+1)
+		if (i==self.size-1):
+			self.MAX = self.MAX.predecessor()
+		if i == 0:
+			self.MIN = self.MIN.successor()
 		##node = self.root.get_node_index(i + 1)
 		if (i>=self.size):
 			return -1
@@ -478,7 +488,7 @@ class AVLTreeList(object):
 		if self.size==0:
 			return None
 		else:
-			return self.root.min().getValue()
+			return self.MIN.getValue()
 
 	"""returns the value of the last item in the list
 	@rtype: str
@@ -488,7 +498,7 @@ class AVLTreeList(object):
 		if self.size == 0:
 			return None
 		else:
-			return self.root.Max().getValue()
+			return self.MAX.getValue()
 
 	"""returns an array representing list 
 	@rtype: list
@@ -517,12 +527,15 @@ class AVLTreeList(object):
 		arr = self.listToArray()
 		arr.sort()
 		i=0
-		Min = self.root.min()
+		root2 = self.cloneBinaryTree(self.root)
+		tree2 = AVLTreeList()
+		tree2.setTree(root2)
+		Min = tree2.root.min()
 		for string in arr:
 			Min.value = arr[i]
 			Min = Min.successor()
 			i+=1
-		return self
+		return tree2
 
 
 
@@ -533,11 +546,14 @@ class AVLTreeList(object):
 	def permutation(self):
 		temp = self.listToArray()
 		random.shuffle(temp)
-		Min = self.root.min()
-		for j in range(self.size):
+		root2 = self.cloneBinaryTree(self.root)
+		tree2 = AVLTreeList()
+		tree2.setTree(root2)
+		Min = tree2.root.min()
+		for j in range(tree2.size):
 			Min.value = temp[j]
 			Min = Min.successor()
-		return self
+		return tree2
 
 	"""concatenates lst to self
 	@type lst: AVLTreeList
@@ -564,15 +580,36 @@ class AVLTreeList(object):
 			Min = Min.successor()
 		return index
 
-
-
+	def cloneBinaryTree(self,curr: AVLNode):
+		if curr.isRealNode() == False:
+			return
+		root_copy = AVLNode(curr.getValue())
+		root_copy.size = curr.getSize()
+		root_copy.height = curr.getHeight()
+		if curr.getLeft() is None:
+			root_copy.left = AVLNode.virtual_node
+		else:
+			root_copy.left = self.cloneBinaryTree(curr.left)
+		root_copy.left.parent = root_copy
+		if curr.getRight() is None:
+			root_copy.right = AVLNode.virtual_node
+		else:
+			root_copy.right = self.cloneBinaryTree(curr.right)
+		root_copy.right.parent = root_copy
+		return root_copy
+	def setTree(self,Root:AVLNode):
+		self.root = Root
+		self.size = Root.getSize()
 
 	"""returns the root of the tree representing the list
 	@rtype: AVLNode
 	@returns: the root, None if the list is empty
 	"""
 	def getRoot(self):
+		if self.empty():
+			return None
 		return self.root
+
 
 	def inorder(self, Root: AVLNode):
 		if Root.isRealNode():
@@ -582,10 +619,17 @@ class AVLTreeList(object):
 
 
 
-tree = AVLTreeList()
-arr = ["a","b", "c" , "d" , "e" , "f" , "g", "h"]
-for i in range(8):
-	tree.insert(i,arr[i])
+##tree = AVLTreeList()
+##arr = ["a","c", "b" , "r" , "e" , "w" ]
+##for i in range(6):
+##	tree.insert(i,arr[i])
+##tree.delete(5)
+##tree.delete(4)
+##tree.delete(0)
+##tree.delete(0)
+##print(tree.first())
+##print(tree.retrieve(0))
+
 
 
 
