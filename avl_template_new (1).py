@@ -150,7 +150,7 @@ class AVLNode(object):
 		else:
 			return self.left.getHeight()-self.right.getHeight()
 
-	def get_node_index(self, i):
+	def get_node_index(self, i): #like select(i)
 			leftsize  = self.left.getSize()+1
 			if i < leftsize:
 				return self.left.get_node_index(i)
@@ -159,13 +159,13 @@ class AVLNode(object):
 			else:
 				return self
 
-	def Max(self):
+	def Max(self): #right all the way
 		temp = self
 		while temp.right.isRealNode():
 			temp = temp.right
 		return temp
 
-	def min(self):
+	def min(self): #left all the way
 		temp = self
 		while temp.left.isRealNode():
 			temp = temp.left
@@ -600,6 +600,8 @@ class AVLTreeList(object):
 	def setTree(self,Root:AVLNode):
 		self.root = Root
 		self.size = Root.getSize()
+		self.MAX = Root.Max()
+		self.MIN = Root.min()
 
 	"""returns the root of the tree representing the list
 	@rtype: AVLNode
@@ -620,14 +622,12 @@ class AVLTreeList(object):
 
 
 ##tree = AVLTreeList()
-##arr = ["a","c", "b" , "r" , "e" , "w" ]
-##for i in range(6):
+##arr = ["a","b","c","d","e"]
+##for i in range(5):
 ##	tree.insert(i,arr[i])
-##tree.delete(5)
-##tree.delete(4)
-##tree.delete(0)
-##tree.delete(0)
-##print(tree.first())
+##tree2 = tree.permutation()
+print(tree2.retrieve(4))
+##print(tree.last())
 ##print(tree.retrieve(0))
 
 
