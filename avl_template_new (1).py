@@ -222,7 +222,14 @@ class AVLTreeList(object):
 	"""returns whether the list is empty
 	@rtype: bool
 	@returns: True if the list is empty, False otherwise
+	
 	"""
+
+	def shuffler(self,arr, n):
+		for i in range(n - 1, 0, -1):
+			j = random.randint(0, i)
+			arr[i], arr[j] = arr[j], arr[i]
+		return arr
 	def empty(self):
 		return self.size==0
 
@@ -518,6 +525,31 @@ class AVLTreeList(object):
 	"""
 	def length(self):
 		return self.size
+	def SORT(self,array):
+		if len(array) > 1:
+			r = len(array) // 2
+			L = array[:r]
+			M = array[r:]
+			self.SORT(L)
+			self.SORT(M)
+			i = j = k = 0
+			while i < len(L) and j < len(M):
+				if L[i] < M[j]:
+					array[k] = L[i]
+					i += 1
+				else:
+					array[k] = M[j]
+					j += 1
+				k += 1
+			while i < len(L):
+				array[k] = L[i]
+				i += 1
+				k += 1
+
+			while j < len(M):
+				array[k] = M[j]
+				j += 1
+				k += 1
 
 	"""sort the info values of the list
 	@rtype: list
@@ -525,7 +557,7 @@ class AVLTreeList(object):
 	"""
 	def sort(self):
 		arr = self.listToArray()
-		arr.sort()
+		self.SORT(arr)
 		i=0
 		root2 = self.cloneBinaryTree(self.root)
 		tree2 = AVLTreeList()
@@ -545,7 +577,8 @@ class AVLTreeList(object):
 	"""
 	def permutation(self):
 		temp = self.listToArray()
-		random.shuffle(temp)
+		##random.shuffle(temp)
+		self.shuffler(temp,self.size)
 		root2 = self.cloneBinaryTree(self.root)
 		tree2 = AVLTreeList()
 		tree2.setTree(root2)
@@ -622,11 +655,11 @@ class AVLTreeList(object):
 
 
 ##tree = AVLTreeList()
-##arr = ["a","b","c","d","e"]
+##arr = ["w","a","c","z","d"]
 ##for i in range(5):
 ##	tree.insert(i,arr[i])
-##tree2 = tree.permutation()
-print(tree2.retrieve(4))
+##tree2 = tree.sort()
+##tree2.inorder(tree2.root)
 ##print(tree.last())
 ##print(tree.retrieve(0))
 
