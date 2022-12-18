@@ -86,6 +86,8 @@ class AVLNode(object):
     """
 
 	def getHeight(self):
+		if self.isRealNode() == False:
+			return -1
 		return self.height
 
 	"""sets left child
@@ -142,8 +144,10 @@ class AVLNode(object):
 		if self.isRealNode()==False:
 			return 0
 		return self.size
+
 	def setSize(self,s):
 		self.size = s
+
 	def get_BF(self):
 		if self.isRealNode()==False:
 			return 0
@@ -214,8 +218,8 @@ class AVLTreeList(object):
 	def __init__(self):
 		self.size = 0
 		self.root = AVLNode(None)
-		self.MIN = AVLNode(None)
-		self.MAX = AVLNode(None)
+		self.lastItem = AVLNode(None)
+		self.firstItem = AVLNode(None)
 		# add your fields here
 
 
@@ -307,13 +311,13 @@ class AVLTreeList(object):
 			temp1 = self.root.Max()
 			temp1.setRight(node)
 			node.setParent(temp1)
-			self.MAX = node
+			self.firstItem = node
 			par = temp1
 
 		elif self.empty() and i ==self.size:
 			self.root = node
-			self.MAX = node
-			self.MIN = node
+			self.firstItem = node
+			self.lastItem = node
 			par = AVLNode.virtual_node
 
 		else:
@@ -323,7 +327,7 @@ class AVLTreeList(object):
 				node.setParent(index_node)
 				par = index_node
 				if (i==0):
-					self.MIN = node
+					self.lastItem = node
 			else:
 				pred = index_node.predecessor()
 				pred.setRight(node)
@@ -361,16 +365,16 @@ class AVLTreeList(object):
 			temp = temp.parent
 		return cnt
 
-	def replace(self, u: AVLNode, v: AVLNode):
-		if u.parent.isRealNode()==False:
-			self.root = v
-		elif u == u.parent.left:
-			u.parent.left = v
+	def replace(self, x: AVLNode, y: AVLNode):
+		if x.parent.isRealNode()==False:
+			self.root = y
+		elif x == x.parent.left:
+			x.parent.left = y
 		else:
-			u.parent.right = v
+			x.parent.right = y
 
-		if v.isRealNode():
-			v.parent = u.parent
+		if y.isRealNode():
+			y.parent = x.parent
 
 	def Fix_Up_Delete(self, node:AVLNode):
 		cnt = 0
@@ -440,27 +444,17 @@ class AVLTreeList(object):
 		cnt=0
 		node = self.root.get_node_index(i+1)
 		if (i==self.size-1):
-			self.MAX = self.MAX.predecessor()
+			self.firstItem = self.firstItem.predecessor()
 		if i == 0:
-			self.MIN = self.MIN.successor()
-		##node = self.root.get_node_index(i + 1)
+			self.lastItem = self.lastItem.successor()
 		if (i>=self.size):
 			return -1
-		##if node.getleft.isRealNode() == False:
 		if node.getLeft() is None:
 			self.replace(node, node.right)
-			##node.recalculate_node_attributes()
-			##node.right.recalculate_node_attributes()
-			##self.size -= 1
-			##if node.right.isRealNode():
 			if node.getRight() is None:
 				cnt += self.Fix_Up_Delete(node.right)
-
-		##elif node.right.isRealNode()== False:
 		elif node.getRight() is None:
 			self.replace(node, node.left)
-			##node.recalculate_node_attributes()
-			##node.left.recalculate_node_attributes()
 			if node.getLeft != None:
 				cnt += self.Fix_Up_Delete(node.left)
 
@@ -470,15 +464,10 @@ class AVLTreeList(object):
 				self.replace(y, y.right)
 				y.right = node.right
 				y.right.parent = y
-				##y.recalculate_node_attributes()
-				##y.right.recalculate_node_attributes()
-
 
 			self.replace(node, y)
 			y.left = node.left
 			y.left.parent = y
-			##y.left.recalculate_node_attributes()
-			##node.recalculate_node_attributes()
 			if y.isRealNode():
 				cnt += self.Fix_Up_Delete(y)
 		self.size -= 1
@@ -495,7 +484,7 @@ class AVLTreeList(object):
 		if self.size==0:
 			return None
 		else:
-			return self.MIN.getValue()
+			return self.lastItem.getValue()
 
 	"""returns the value of the last item in the list
 	@rtype: str
@@ -505,7 +494,7 @@ class AVLTreeList(object):
 		if self.size == 0:
 			return None
 		else:
-			return self.MAX.getValue()
+			return self.firstItem.getValue()
 
 	"""returns an array representing list 
 	@rtype: list
@@ -541,6 +530,9 @@ class AVLTreeList(object):
 					array[k] = M[j]
 					j += 1
 				k += 1
+
+			# When we run out of elements in either L or M,
+			# pick up the remaining elements and put in A[p..r]
 			while i < len(L):
 				array[k] = L[i]
 				i += 1
@@ -633,8 +625,8 @@ class AVLTreeList(object):
 	def setTree(self,Root:AVLNode):
 		self.root = Root
 		self.size = Root.getSize()
-		self.MAX = Root.Max()
-		self.MIN = Root.min()
+		self.firstItem = Root.Max()
+		self.lastItem = Root.min()
 
 	"""returns the root of the tree representing the list
 	@rtype: AVLNode
@@ -645,6 +637,13 @@ class AVLTreeList(object):
 			return None
 		return self.root
 
+	def append(self, val):
+		self.insert(self.length(), val)
+		return
+
+	def	getTreeHeight(self):
+		return self.root.getHeight()
+
 
 	def inorder(self, Root: AVLNode):
 		if Root.isRealNode():
@@ -653,11 +652,11 @@ class AVLTreeList(object):
 			self.inorder(Root.right)
 
 
-
 ##tree = AVLTreeList()
 ##arr = ["w","a","c","z","d"]
 ##for i in range(5):
 ##	tree.insert(i,arr[i])
+##tree.append(2)
 ##tree2 = tree.sort()
 ##tree2.inorder(tree2.root)
 ##print(tree.last())
