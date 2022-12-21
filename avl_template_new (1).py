@@ -155,11 +155,18 @@ class AVLNode(object):
 			return self.left.getHeight()-self.right.getHeight()
 
 	def get_node_index(self, i): #like select(i)
-			leftsize  = self.left.getSize()+1
+			##if self.getLeft() is None:
+				##return self
+			if self.getLeft() is None:
+				leftsize = 0
+			else:
+				leftsize  = self.getLeft().getSize()+1
 			if i < leftsize:
-				return self.left.get_node_index(i)
+				return self.getLeft().get_node_index(i)
 			elif i > leftsize:
-				return self.right.get_node_index(i - leftsize)
+				if self.getRight() is None:
+					return self
+				return self.getRight().get_node_index(i - leftsize)
 			else:
 				return self
 
@@ -651,21 +658,36 @@ class AVLTreeList(object):
 			print(Root.getValue())
 			self.inorder(Root.right)
 
+	def testq1(self):
+		count=0
+		for i in range(1, 11):
+			tree = AVLTreeList()
+			n = 1500 * (2 ** i)
+			for j in range(0, n // 2):
+				k = random.randint(0, tree.length())
+				count += tree.insert(k, str(k))
+			for j in range(0, n // 2):
+				if j % 2 == 0:
+					k = random.randint(0, tree.length() - 1)
+					count += tree.delete(k)
+				else:
+					k = random.randint(0, tree.length())
+					count += tree.insert(k, str(k))
+			print("count for i =", i, " is:", count)
 
-##tree = AVLTreeList()
+
+
+
+tree = AVLTreeList()
+tree.testq1()
 ##arr = ["w","a","c","z","d"]
 ##for i in range(5):
-##	tree.insert(i,arr[i])
-##tree.append(2)
+##	tree.insert(0,arr[i])
+
 ##tree2 = tree.sort()
 ##tree2.inorder(tree2.root)
 ##print(tree.last())
 ##print(tree.retrieve(0))
-
-
-
-
-
 ##print(tree.search("D"))
 ##cnt = tree.insert(3,"F")
 ##print(tree.delete(3))
