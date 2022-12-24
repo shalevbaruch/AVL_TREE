@@ -158,13 +158,20 @@ class AVLNode(object):
             return self.getLeft().getHeight() - self.getRight().getHeight()
 
     def get_node_index(self, i):  # like select(i)
-        leftsize = self.getLeft().getSize() + 1
-        if i < leftsize:
-            return self.getLeft().get_node_index(i)
-        elif i > leftsize:
-            return self.getRight().get_node_index(i - leftsize)
-        else:
-            return self
+            ##if self.getLeft() is None:
+            ##return self
+            if not(self.getLeft().isRealNode()):
+                leftsize = 0
+            else:
+                leftsize = self.getLeft().getSize() + 1
+            if i < leftsize:
+                return self.getLeft().get_node_index(i)
+            elif i > leftsize:
+                if not(self.getRight().isRealNode()):
+                    return self
+                return self.getRight().get_node_index(i - leftsize)
+            else:
+                return self
 
     def Max(self):  # right all the way
         temp = self
@@ -230,6 +237,7 @@ class AVLTreeList(object):
     """
 
     def shuffler(self, arr, n):
+
         for i in range(n - 1, 0, -1):
             j = random.randint(0, i)
             arr[i], arr[j] = arr[j], arr[i]
@@ -375,6 +383,10 @@ class AVLTreeList(object):
 
         if y.isRealNode():
             y.setParent(x.getParent())
+        ##x.setLeft(AVLNode.virtual_node)
+        ##x.setRight(AVLNode.virtual_node)
+        ##x.setParent(AVLNode.virtual_node)
+        ##y.recalculate_node_attributes()
 
     def Fix_Up_Delete(self, node: AVLNode):
         cnt = 0
@@ -434,6 +446,12 @@ class AVLTreeList(object):
     """
 
     def delete(self, i):
+        if (self.length() == 1):
+            self.firstItem = None
+            self.lastItem = None
+            self.size = 0
+            self.root = None
+            return 0
         cnt = 0
         node = self.root.get_node_index(i + 1)
         if i == self.size - 1:
@@ -442,8 +460,11 @@ class AVLTreeList(object):
             self.lastItem = self.lastItem.successor()
         if i >= self.size:
             return -1
+        if (self.size == 2):
+            self.lastItem = self.firstItem
         if not(node.getLeft().isRealNode()):
             self.replace(node, node.getRight())
+            node.recalculate_node_attributes()
             if not(node.getRight().isRealNode()):
                 cnt += self.Fix_Up_Delete(node.getRight())
         elif not(node.getRight().isRealNode()):
@@ -564,14 +585,14 @@ class AVLTreeList(object):
 
     def permutation(self):
         temp = self.listToArray()
-        ##random.shuffle(temp)
+        random.shuffle(temp)
         self.shuffler(temp, self.size)
         root2 = self.cloneBinaryTree(self.root)
         tree2 = AVLTreeList()
         tree2.setTree(root2)
         minimum = tree2.root.Min()
-        for j in range(tree2.size):
-            minimum.value = temp[j]
+        for inti in temp:
+            minimum.value = inti
             minimum = minimum.successor()
         return tree2
 
@@ -636,12 +657,6 @@ class AVLTreeList(object):
             return None
         return self.root
 
-    def append(self, val):
-        self.insert(self.length(), val)
-        return
-
-    def getTreeHeight(self):
-        return self.root.getHeight()
 
     def inorder(self, Root: AVLNode):
         if Root.isRealNode():
@@ -649,18 +664,59 @@ class AVLTreeList(object):
             print(Root.getValue())
             self.inorder(Root.getRight())
 
+    def testq1(self):
+        count = 0
+        for i in range(1, 11):
+            tree = AVLTreeList()
+            n = 1500 * (2 ** i)
+            for j in range(0, n // 2):
+                k = random.randint(0, tree.length())
+                count += tree.insert(k, str(k))
+            for j in range(0, n // 2):
+                if j % 2 == 0:
+                    k = random.randint(0, tree.length() - 1)
+                    count += tree.delete(k)
+                else:
+                    k = random.randint(0, tree.length())
+                    count += tree.insert(k, str(k))
+            print("count for i =", i, " is:", count)
+
 ##tree = AVLTreeList()
-##arr = ["w","a","c","z","d"]
+##tree.testq1()
+#3arr = ["w","a","c","z","d"]
 ##for i in range(5):
 ##	tree.insert(i,arr[i])
-##tree.append(2)
-##tree2 = tree.sort()
-##tree2.inorder(tree2.root)
+##for i in range(5):
+##	tree.delete(0)
+##for i in range(4):
+##	tree.delete(0)
+##tree.delete(0)
+##tree.delete(0)
+##tree.delete(0)
+##tree.delete(1)
+##tree.delete(0)
+##print(tree.first())
 ##print(tree.last())
-##print(tree.retrieve(0))
+##print(tree.size)
+##tree.delete(0)
+##tree.inorder(tree.sort().root)
+##tree.inorder(tree.permutation().getRoot())
 
 
-##print(tree.search("D"))
+
+##tree2 = tree.permutation()
+##tree2.inorder(tree2.root)
+##print (tree.inorder(tree.root))
+##print (tree.inorder(tree.root))
+##print (tree.inorder(tree.root))
+##tree.delete(0)
+##print(tree.first())
+##print(tree.retrieve(2))
+##tree2 = AVLTreeList()
+##tree2.testq1()
+
+
+#print(tree.search("d"))
 ##cnt = tree.insert(3,"F")
 ##print(tree.delete(3))
 ##print(tree.insert(4,"A"))
