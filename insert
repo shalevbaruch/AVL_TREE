@@ -1,9 +1,9 @@
-    def insert(self, i, val):
-        if (i >= self.size + 1):
+def insert(self, i, val):
+        if i >= self.size + 1:
             return -1
         cnt = 0
         node = AVLNode(val)
-        if (i == self.size and self.empty() == False):
+        if i == self.size and not (self.empty()):
             temp1 = self.root.Max()
             temp1.setRight(node)
             node.setParent(temp1)
@@ -18,45 +18,44 @@
 
         else:
             index_node = self.root.get_node_index(i + 1)
-            if index_node.getLeft() is None:
+            if not (index_node.getLeft().isRealNode()):
                 index_node.setLeft(node)
                 node.setParent(index_node)
                 par = index_node
-                if (i == 0):
+                if i == 0:
                     self.lastItem = node
             else:
                 pred = index_node.predecessor()
                 pred.setRight(node)
                 node.setParent(pred)
                 par = pred
-        if node.getParent() is None:
-            self.root = node;
+        if not (node.getParent().isRealNode()):
+            self.root = node
         temp = node
         self.size += 1
-        while (par.isRealNode()):
+        while par.isRealNode():
             par.recalculate_node_attributes()
-            grand = par.parent
+            grand = par.getParent()
             if grand.get_BF() >= 2 or grand.get_BF() <= -2:
-                if par == grand.left:
-                    if temp == grand.left.left:
+                if par == grand.getLeft():
+                    if temp == grand.getLeft().getLeft():
                         self.right_rotate(grand)
                         cnt += 1
 
-                    elif temp == grand.left.right:
+                    elif temp == grand.getLeft().getRight():
                         self.left_rotate(par)
                         self.right_rotate(grand)
                         cnt += 2
 
-
-                elif par == grand.right:
-                    if temp == grand.right.right:
+                elif par == grand.getRight():
+                    if temp == grand.getRight().getRight():
                         self.left_rotate(grand)
                         cnt += 1
 
-                    elif temp == grand.right.left:
+                    elif temp == grand.getRight().getLeft():
                         self.right_rotate(par)
                         self.left_rotate(grand)
                         cnt += 2
-            par = par.parent
-            temp = temp.parent
+            par = par.getParent()
+            temp = temp.getParent()
         return cnt
