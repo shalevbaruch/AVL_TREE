@@ -663,8 +663,33 @@ class AVLTreeList(object):
             self.inorder(Root.getLeft())
             print(Root.getValue())
             self.inorder(Root.getRight())
+    def testq1Part1(self):
+        print("question 1")
+        print("part 1")
+        count = 0
+        for i in range(1, 11):
+            tree = AVLTreeList()
+            n = 1500 * (2 ** i)
+            for j in range(0, n):
+                k = random.randint(0, tree.length())
+                count += tree.insert(k, str(k))
+            print("count for i =", i, " is:", count)
+    def testq1Part2(self):
+        print("part 2")
+        count = 0
+        for i in range(1, 11):
+            tree = AVLTreeList()
+            n = 1500 * (2 ** i)
+            for j in range(0, n):
+                k = random.randint(0, tree.length())
+                tree.insert(k, str(k))
+            for j in range(0, n):
+                k = random.randint(0, tree.length() - 1)
+                count += tree.delete(k)
+            print("count for i =", i, " is:", count)
 
-    def testq1(self):
+    def testq1Part3(self):
+        print("part 3")
         count = 0
         for i in range(1, 11):
             tree = AVLTreeList()
@@ -680,9 +705,42 @@ class AVLTreeList(object):
                     k = random.randint(0, tree.length())
                     count += tree.insert(k, str(k))
             print("count for i =", i, " is:", count)
+    def testq2Part1(self):
+        print("question 2")
+        print("part 3")
+        count = 0
+        for i in range(1, 11):
+            tree = AVLTreeList()
+            n = 1500 * (2 ** i)
+            for j in range(0, n):
+                k = random.randint(0, tree.length())
+                count += tree.insert(0, str(k))
+            print("count for i =", i, " is:", count)
+    def testq2Part2(self):
+        print("part 3")
+        count = 0
+        for i in range(1, 11):
+            tree = AVLTreeList()
+            n = 1500 * (2 ** i)
+            for j in range(0, n):
+                k = random.randint(0, tree.length())
+                count += tree.insert(k, str(k))
+            print("count for i =", i, " is:", count)
 
-##tree = AVLTreeList()
-##tree.testq1()
+    def testq2Part3(self):
+        print("part 3")
+        count = 0
+        for i in range(1, 11):
+            tree = AVLTreeList()
+            n = 1500 * (2 ** i)
+            for j in range(0, n):
+                k = random.randint(0, tree.length())
+                count += tree.insert(tree.length(), str(k))
+
+tree = AVLTreeList()
+tree.testq1Part1()
+tree.testq1Part2()
+tree.testq1Part3()
 #3arr = ["w","a","c","z","d"]
 ##for i in range(5):
 ##	tree.insert(i,arr[i])
