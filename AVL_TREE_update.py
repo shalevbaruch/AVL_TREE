@@ -5,6 +5,13 @@
 # name2    - Jonathan Nethanel
 
 
+# username - shalevbaruch,nethanel1
+# id1      - 213070477
+# name1    - Shalev Baruch
+# id2      - 214194839
+# name2    - Jonathan Nethanel
+
+
 import random
 
 """A class represnting a node in an AVL tree"""
@@ -160,20 +167,20 @@ class AVLNode(object):
             return self.getLeft().getHeight() - self.getRight().getHeight()
 
     def get_node_index(self, i):  # like select(i)
-            ##if self.getLeft() is None:
-            ##return self
-            if not(self.getLeft().isRealNode()):
-                leftsize = 1
-            else:
-                leftsize = self.getLeft().getSize() + 1
-            if i < leftsize:
-                return self.getLeft().get_node_index(i)
-            elif i > leftsize:
-                if not(self.getRight().isRealNode()):
-                    return self
-                return self.getRight().get_node_index(i - leftsize)
-            else:
+        ##if self.getLeft() is None:
+        ##return self
+        if not (self.getLeft().isRealNode()):
+            leftsize = 1
+        else:
+            leftsize = self.getLeft().getSize() + 1
+        if i < leftsize:
+            return self.getLeft().get_node_index(i)
+        elif i > leftsize:
+            if not (self.getRight().isRealNode()):
                 return self
+            return self.getRight().get_node_index(i - leftsize)
+        else:
+            return self
 
     def Max(self):  # right all the way
         temp = self
@@ -226,11 +233,10 @@ class AVLTreeList(object):
 
     def __init__(self):
         self.size = 0
-        self.root = AVLNode(None)
-        self.lastitem = AVLNode(None)
-        self.firstitem = AVLNode(None)
-
-    # add your fields here
+        AVLNode(" ")
+        self.root = AVLNode.virtual_node
+        self.lastitem = AVLNode.virtual_node
+        self.firstitem = AVLNode.virtual_node
 
     """returns whether the list is empty
     @rtype: bool
@@ -313,7 +319,6 @@ class AVLTreeList(object):
         x.recalculate_node_attributes()
         y.recalculate_node_attributes()
 
-
     def insert(self, i, val):
         if i >= self.size + 1:
             return -1
@@ -333,7 +338,7 @@ class AVLTreeList(object):
             par = AVLNode.virtual_node
 
         else:
-            if (i==0):
+            if (i == 0):
                 index_node = self.firstitem
             else:
                 index_node = self.root.get_node_index(i + 1)
@@ -397,9 +402,14 @@ class AVLTreeList(object):
     def Fix_Up_Delete(self, node: AVLNode):
         cnt = 0
         temp = node
+        ##if ()
 
         while temp.isRealNode():
             temp.recalculate_node_attributes()
+            if temp.getRight().isRealNode():
+                temp.getRight().recalculate_node_attributes()
+            if temp.getLeft().isRealNode():
+                temp.getLeft().recalculate_node_attributes()
             if temp.get_BF() <= -2 or temp.get_BF() >= 2:
                 x = temp
 
@@ -452,11 +462,11 @@ class AVLTreeList(object):
     """
 
     def delete(self, i):
-        if (self.length() == 1):
-            self.lastitem = None
-            self.firstitem = None
+        if self.length() == 1:
+            self.lastitem = AVLNode.virtual_node
+            self.firstitem = AVLNode.virtual_node
             self.size = 0
-            self.root = None
+            self.root = AVLNode.virtual_node
             return 0
         cnt = 0
         node = self.root.get_node_index(i + 1)
@@ -466,20 +476,26 @@ class AVLTreeList(object):
             self.firstitem = self.firstitem.successor()
         if i >= self.size:
             return -1
-        if (self.size == 2):
+        if self.size == 2:
             self.firstitem = self.lastitem
-        if not(node.getLeft().isRealNode()):
+        if not (node.getLeft().isRealNode()):
+            par = node.getParent()
             self.replace(node, node.getRight())
-            node.recalculate_node_attributes()
-            if not(node.getRight().isRealNode()):
-                cnt += self.Fix_Up_Delete(node.getRight())
-        elif not(node.getRight().isRealNode()):
+            if (node.getRight().isRealNode()):
+                cnt += self.Fix_Up_Delete(par)
+            else:
+                self.Fix_Up_Delete(par)
+        elif not (node.getRight().isRealNode()):
+            par = node.getParent()
             self.replace(node, node.getLeft())
             if node.getLeft().isRealNode():
                 cnt += self.Fix_Up_Delete(node.getLeft())
+            else:
+                self.Fix_Up_Delete(par)
 
         else:
             y = node.successor()
+            par = y.getParent()
             if y.getParent() != node:
                 self.replace(y, y.getRight())
                 y.right = node.getRight()
@@ -490,6 +506,8 @@ class AVLTreeList(object):
             y.getLeft().setParent(y)
             if y.isRealNode():
                 cnt += self.Fix_Up_Delete(y)
+            else:
+                self.Fix_Up_Delete(par)
         self.size -= 1
         return cnt
 
@@ -609,8 +627,59 @@ class AVLTreeList(object):
     @returns: the absolute value of the difference between the height of the AVL trees joined
     """
 
-    def concat(self, lst):
+    def joinSTB(self, connecting_node, lst):  # STB == Small To Big
+        h1 = self.root.getHeight()
+        temp = lst.root
+        while temp.isRealNode() and temp.getHeight() > h1:
+            temp = temp.getLeft()
+        tmp_parent = temp.getParent()
+        connecting_node.setLeft(self.root)
+        self.root.setParent(connecting_node)
+        connecting_node.setRight(temp)
+        temp.setParent(connecting_node)
+        tmp_parent.setLeft(connecting_node)
+        connecting_node.setParent(tmp_parent)
+        self.Fix_Up_Delete(connecting_node)
+        self.root = lst.root
+        self.lastitem = lst.lastitem
         return None
+
+    def joinBTS(self, connecting_node, lst):  # BTS == Big To Small
+        h1 = lst.getRoot().getHeight()
+        temp = self.getRoot()
+        while temp.isRealNode() and temp.getHeight() > h1:
+            temp = temp.getRight()
+        tmp_parent = temp.getParent()
+        connecting_node.setRight(lst.getRoot())
+        lst.getRoot().setParent(connecting_node)
+        connecting_node.setLeft(temp)
+        temp.setParent(connecting_node)
+        tmp_parent.setRight(connecting_node)
+        connecting_node.setParent(tmp_parent)
+        self.Fix_Up_Delete(connecting_node)
+        self.lastitem = lst.lastitem
+        return
+
+
+
+    def concat(self, lst):
+        h1 = self.getRoot().getHeight()
+        h2 = lst.root.getHeight()
+        if not (lst.root.isRealNode()) or lst is None:
+            return h1 + 1
+        elif not (self.root.isRealNode()):
+            self.root = lst.root
+            self.lastitem = lst.lastitem
+            self.firstitem = lst.firstitem
+            return h2 + 1
+        else:
+            connecting_node = self.lastitem
+            self.delete(self.size - 1)
+            if h1 <= h2:
+                self.joinSTB(connecting_node, lst)
+            else:
+                self.joinBTS(connecting_node, lst)
+        return abs(h1 - h2)
 
     """searches for a *value* in the list
     @type val: str
@@ -635,12 +704,12 @@ class AVLTreeList(object):
         root_copy = AVLNode(curr.getValue())
         root_copy.setSize(curr.getSize())
         root_copy.setHeight(curr.getHeight())
-        if not(curr.getLeft().isRealNode()):
+        if not (curr.getLeft().isRealNode()):
             root_copy.setLeft(AVLNode.virtual_node)
         else:
             root_copy.setLeft(self.cloneBinaryTree(curr.getLeft()))
         root_copy.getLeft().setParent(root_copy)
-        if not(curr.getRight().isRealNode()):
+        if not (curr.getRight().isRealNode()):
             root_copy.setRight(AVLNode.virtual_node)
         else:
             root_copy.setRight(self.cloneBinaryTree(curr.getRight()))
@@ -651,7 +720,7 @@ class AVLTreeList(object):
         self.root = Root
         self.size = Root.getSize()
         self.lastitem = Root.Max()
-        self.firstitem= Root.Min()
+        self.firstitem = Root.Min()
 
     """returns the root of the tree representing the list
     @rtype: AVLNode
@@ -660,15 +729,15 @@ class AVLTreeList(object):
 
     def getRoot(self):
         if self.empty():
-            return None
+            return AVLNode.virtual_node
         return self.root
-
 
     def inorder(self, Root: AVLNode):
         if Root.isRealNode():
             self.inorder(Root.getLeft())
             print(Root.getValue())
             self.inorder(Root.getRight())
+
     def testq1Part1(self):
         print("question 1")
         print("part 1")
@@ -680,6 +749,7 @@ class AVLTreeList(object):
                 k = random.randint(0, tree.length())
                 count += tree.insert(k, str(k))
             print("count for i =", i, " is:", count)
+
     def testq1Part2(self):
         print("part 2")
         count = 0
@@ -711,6 +781,7 @@ class AVLTreeList(object):
                     k = random.randint(0, tree.length())
                     count += tree.insert(k, str(k))
             print("count for i =", i, " is:", count)
+
     def testq2Part1(self):
         print("question 2")
         print("part 3")
@@ -722,6 +793,7 @@ class AVLTreeList(object):
                 k = random.randint(0, tree.length())
                 count += tree.insert(0, str(k))
             print("count for i =", i, " is:", count)
+
     def testq2Part2(self):
         print("part 3")
         count = 0
@@ -743,7 +815,17 @@ class AVLTreeList(object):
                 k = random.randint(0, tree.length())
                 count += tree.insert(tree.length(), str(k))
 
+
 ##tree = AVLTreeList()
+##arr = ["a","b","c","d","e","f","g"]
+##for i in range(len(arr)):
+##    tree.insert(i,arr[i])
+##tree.delete(0)
+##tree.delete(6)
+##tree.testq1Part1()
+##tree.testq1Part2()
+##tree.testq1Part3()
+
 ##tree2 = AVLTreeList()
 ##tree2.insert(0,"0")
 ##tree2.insert(1,"1")
