@@ -83,6 +83,8 @@ class AVLNode(object):
     """
 
     def getHeight(self):
+        if not (self.isRealNode()):
+            return -1
         return self.height
 
     """sets left child
@@ -161,7 +163,7 @@ class AVLNode(object):
             ##if self.getLeft() is None:
             ##return self
             if not(self.getLeft().isRealNode()):
-                leftsize = 0
+                leftsize = 1
             else:
                 leftsize = self.getLeft().getSize() + 1
             if i < leftsize:
@@ -225,8 +227,8 @@ class AVLTreeList(object):
     def __init__(self):
         self.size = 0
         self.root = AVLNode(None)
-        self.lastItem = AVLNode(None)
-        self.firstItem = AVLNode(None)
+        self.lastitem = AVLNode(None)
+        self.firstitem = AVLNode(None)
 
     # add your fields here
 
@@ -311,32 +313,36 @@ class AVLTreeList(object):
         x.recalculate_node_attributes()
         y.recalculate_node_attributes()
 
+
     def insert(self, i, val):
         if i >= self.size + 1:
             return -1
         cnt = 0
         node = AVLNode(val)
         if i == self.size and not (self.empty()):
-            temp1 = self.root.Max()
+            temp1 = self.lastitem
             temp1.setRight(node)
             node.setParent(temp1)
-            self.firstItem = node
+            self.lastitem = node
             par = temp1
 
         elif self.empty() and i == self.size:
             self.root = node
-            self.firstItem = node
-            self.lastItem = node
+            self.lastitem = node
+            self.firstitem = node
             par = AVLNode.virtual_node
 
         else:
-            index_node = self.root.get_node_index(i + 1)
+            if (i==0):
+                index_node = self.firstitem
+            else:
+                index_node = self.root.get_node_index(i + 1)
             if not (index_node.getLeft().isRealNode()):
                 index_node.setLeft(node)
                 node.setParent(index_node)
                 par = index_node
                 if i == 0:
-                    self.lastItem = node
+                    self.firstitem = node
             else:
                 pred = index_node.predecessor()
                 pred.setRight(node)
@@ -447,21 +453,21 @@ class AVLTreeList(object):
 
     def delete(self, i):
         if (self.length() == 1):
-            self.firstItem = None
-            self.lastItem = None
+            self.lastitem = None
+            self.firstitem = None
             self.size = 0
             self.root = None
             return 0
         cnt = 0
         node = self.root.get_node_index(i + 1)
         if i == self.size - 1:
-            self.firstItem = self.firstItem.predecessor()
+            self.lastitem = self.lastitem.predecessor()
         if i == 0:
-            self.lastItem = self.lastItem.successor()
+            self.firstitem = self.firstitem.successor()
         if i >= self.size:
             return -1
         if (self.size == 2):
-            self.lastItem = self.firstItem
+            self.firstitem = self.lastitem
         if not(node.getLeft().isRealNode()):
             self.replace(node, node.getRight())
             node.recalculate_node_attributes()
@@ -496,7 +502,7 @@ class AVLTreeList(object):
         if self.size == 0:
             return None
         else:
-            return self.lastItem.getValue()
+            return self.firstitem.getValue()
 
     """returns the value of the last item in the list
     @rtype: str
@@ -507,7 +513,7 @@ class AVLTreeList(object):
         if self.size == 0:
             return None
         else:
-            return self.firstItem.getValue()
+            return self.lastitem.getValue()
 
     """returns an array representing list 
     @rtype: list
@@ -516,7 +522,7 @@ class AVLTreeList(object):
 
     def listToArray(self):
         arr = [None for i in range(self.size)]
-        minimum = self.root.Min()
+        minimum = self.firstitem
         for j in range(self.size):
             arr[j] = minimum.getValue()
             minimum = minimum.successor()
@@ -571,7 +577,7 @@ class AVLTreeList(object):
         root2 = self.cloneBinaryTree(self.root)
         tree2 = AVLTreeList()
         tree2.setTree(root2)
-        minimum = tree2.root.Min()
+        minimum = tree2.firstitem
         for string in arr:
             minimum.value = arr[i]
             minimum = minimum.successor()
@@ -590,7 +596,7 @@ class AVLTreeList(object):
         root2 = self.cloneBinaryTree(self.root)
         tree2 = AVLTreeList()
         tree2.setTree(root2)
-        minimum = tree2.root.Min()
+        minimum = tree2.firstitem
         for inti in temp:
             minimum.value = inti
             minimum = minimum.successor()
@@ -614,7 +620,7 @@ class AVLTreeList(object):
     """
 
     def search(self, val):
-        minimum = self.root.Min()
+        minimum = self.firstitem
         index = -1
         for i in range(self.size):
             if minimum.getValue() == val:
@@ -644,8 +650,8 @@ class AVLTreeList(object):
     def setTree(self, Root: AVLNode):
         self.root = Root
         self.size = Root.getSize()
-        self.firstItem = Root.Max()
-        self.lastItem = Root.Min()
+        self.lastitem = Root.Max()
+        self.firstitem= Root.Min()
 
     """returns the root of the tree representing the list
     @rtype: AVLNode
@@ -737,10 +743,33 @@ class AVLTreeList(object):
                 k = random.randint(0, tree.length())
                 count += tree.insert(tree.length(), str(k))
 
-tree = AVLTreeList()
-tree.testq1Part1()
-tree.testq1Part2()
-tree.testq1Part3()
+##tree = AVLTreeList()
+##tree2 = AVLTreeList()
+##tree2.insert(0,"0")
+##tree2.insert(1,"1")
+##tree2.insert(0,"2")
+##print(tree2.listToArray())
+
+##tree.testq1Part1()
+##tree.testq1Part2()
+##tree.testq1Part3()
+##n = 50
+##mylist = []
+##mylist2 = []
+##for j in range(0, n):
+##    k = random.randint(0, tree.length())
+##    mylist2.insert(j,k)
+##    mylist.insert(k,str(j))
+##    tree.insert(k, str(j))
+##print("correct list")
+##print(mylist)
+##print("my list")
+##print(tree.listToArray())
+##print("indexes")
+##print(mylist2)
+##print(tree.first())
+##print(tree.last())
+
 #3arr = ["w","a","c","z","d"]
 ##for i in range(5):
 ##	tree.insert(i,arr[i])
