@@ -5,6 +5,13 @@
 # name2    - Jonathan Nethanel
 
 
+# username - shalevbaruch,nethanel1
+# id1      - 213070477
+# name1    - Shalev Baruch
+# id2      - 214194839
+# name2    - Jonathan Nethanel
+
+
 import random
 
 """A class represnting a node in an AVL tree"""
@@ -226,7 +233,7 @@ class AVLTreeList(object):
 
     def __init__(self):
         self.size = 0
-        AVLNode("")
+        AVLNode(" ")
         self.root = AVLNode.virtual_node
         self.lastitem = AVLNode.virtual_node
         self.firstitem = AVLNode.virtual_node
@@ -387,17 +394,21 @@ class AVLTreeList(object):
 
         if y.isRealNode():
             y.setParent(x.getParent())
-        ##x.setLeft(AVLNode.virtual_node)
-        ##x.setRight(AVLNode.virtual_node)
-        ##x.setParent(AVLNode.virtual_node)
-        ##y.recalculate_node_attributes()
+        x.setParent(AVLNode.virtual_node)
+        x.setLeft(AVLNode.virtual_node)
+        x.setRight(AVLNode.virtual_node)
 
     def Fix_Up_Delete(self, node: AVLNode):
         cnt = 0
         temp = node
+        ##if ()
 
         while temp.isRealNode():
             temp.recalculate_node_attributes()
+            if temp.getRight().isRealNode():
+                temp.getRight().recalculate_node_attributes()
+            if temp.getLeft().isRealNode():
+                temp.getLeft().recalculate_node_attributes()
             if temp.get_BF() <= -2 or temp.get_BF() >= 2:
                 x = temp
 
@@ -467,17 +478,23 @@ class AVLTreeList(object):
         if self.size == 2:
             self.firstitem = self.lastitem
         if not (node.getLeft().isRealNode()):
+            par = node.getParent()
             self.replace(node, node.getRight())
-            node.recalculate_node_attributes()
-            if not (node.getRight().isRealNode()):
-                cnt += self.Fix_Up_Delete(node.getRight())
+            if (node.getRight().isRealNode()):
+                cnt += self.Fix_Up_Delete(par)
+            else:
+                self.Fix_Up_Delete(par)
         elif not (node.getRight().isRealNode()):
+            par = node.getParent()
             self.replace(node, node.getLeft())
             if node.getLeft().isRealNode():
                 cnt += self.Fix_Up_Delete(node.getLeft())
+            else:
+                self.Fix_Up_Delete(par)
 
         else:
             y = node.successor()
+            par = y.getParent()
             if y.getParent() != node:
                 self.replace(y, y.getRight())
                 y.right = node.getRight()
@@ -488,6 +505,8 @@ class AVLTreeList(object):
             y.getLeft().setParent(y)
             if y.isRealNode():
                 cnt += self.Fix_Up_Delete(y)
+            else:
+                self.Fix_Up_Delete(par)
         self.size -= 1
         return cnt
 
@@ -610,37 +629,51 @@ class AVLTreeList(object):
     def joinSTB(self, connecting_node, lst):  # STB == Small To Big
         h1 = self.root.getHeight()
         temp = lst.root
-        while temp.isRealNode() and temp.getHeight() > h1:
-            temp = temp.getLeft()
         tmp_parent = temp.getParent()
+        while temp.isRealNode() and temp.getHeight() > h1:
+            tmp_parent = temp
+            temp = temp.getLeft()
         connecting_node.setLeft(self.root)
         self.root.setParent(connecting_node)
-        connecting_node.setRight(temp)
-        temp.setParent(connecting_node)
-        tmp_parent.setLeft(connecting_node)
-        connecting_node.setParent(tmp_parent)
-        self.Fix_Up_Delete(connecting_node)
-        self.root = lst.root
-        self.lastitem = lst.lastitem
+        if tmp_parent.isRealNode():
+            connecting_node.setRight(temp)
+            if temp.isRealNode():
+                temp.setParent(connecting_node)
+            tmp_parent.setLeft(connecting_node)
+            connecting_node.setParent(tmp_parent)
+            self.root = lst.root
+            self.lastitem = lst.lastitem
+            self.size += lst.size + 1
+            self.Fix_Up_Delete(connecting_node)
+
+        else:
+            connecting_node.setRight(lst.root)
+            lst.root.setParent(connecting_node)
+            self.root = connecting_node
+            connecting_node.setParent(AVLNode.virtual_node)
+            self.lastitem = lst.lastitem
+            self.size += lst.size + 1
+            self.Fix_Up_Delete(connecting_node)
         return None
 
     def joinBTS(self, connecting_node, lst):  # BTS == Big To Small
         h1 = lst.getRoot().getHeight()
         temp = self.getRoot()
-        while temp.isRealNode() and temp.getHeight() > h1:
-            temp = temp.getRight()
         tmp_parent = temp.getParent()
+        while temp.isRealNode() and temp.getHeight() > h1:
+            tmp_parent = temp
+            temp = temp.getRight()
         connecting_node.setRight(lst.getRoot())
         lst.getRoot().setParent(connecting_node)
         connecting_node.setLeft(temp)
-        temp.setParent(connecting_node)
+        if temp.isRealNode():
+            temp.setParent(connecting_node)
         tmp_parent.setRight(connecting_node)
         connecting_node.setParent(tmp_parent)
-        self.Fix_Up_Delete(connecting_node)
         self.lastitem = lst.lastitem
+        self.size += lst.size + 1
+        self.Fix_Up_Delete(connecting_node)
         return
-
-
 
     def concat(self, lst):
         h1 = self.getRoot().getHeight()
@@ -651,11 +684,19 @@ class AVLTreeList(object):
             self.root = lst.root
             self.lastitem = lst.lastitem
             self.firstitem = lst.firstitem
+            self.size = lst.size
             return h2 + 1
         else:
             connecting_node = self.lastitem
             self.delete(self.size - 1)
-            if h1 <= h2:
+            if self.getRoot().getHeight() <= h2:
+                if self.size == 0:
+                    self.root = lst.root
+                    self.lastitem = lst.lastitem
+                    self.firstitem = lst.firstitem
+                    self.insert(0, connecting_node.getValue())
+                    self.size = lst.size + 1
+                    return h2 + 1
                 self.joinSTB(connecting_node, lst)
             else:
                 self.joinBTS(connecting_node, lst)
@@ -717,170 +758,3 @@ class AVLTreeList(object):
             self.inorder(Root.getLeft())
             print(Root.getValue())
             self.inorder(Root.getRight())
-
-    def testq1Part1(self):
-        print("question 1")
-        print("part 1")
-        count = 0
-        for i in range(1, 11):
-            tree = AVLTreeList()
-            n = 1500 * (2 ** i)
-            for j in range(0, n):
-                k = random.randint(0, tree.length())
-                count += tree.insert(k, str(k))
-            print("count for i =", i, " is:", count)
-
-    def testq1Part2(self):
-        print("part 2")
-        count = 0
-        for i in range(1, 11):
-            tree = AVLTreeList()
-            n = 1500 * (2 ** i)
-            for j in range(0, n):
-                k = random.randint(0, tree.length())
-                tree.insert(k, str(k))
-            for j in range(0, n):
-                k = random.randint(0, tree.length() - 1)
-                count += tree.delete(k)
-            print("count for i =", i, " is:", count)
-
-    def testq1Part3(self):
-        print("part 3")
-        count = 0
-        for i in range(1, 11):
-            tree = AVLTreeList()
-            n = 1500 * (2 ** i)
-            for j in range(0, n // 2):
-                k = random.randint(0, tree.length())
-                count += tree.insert(k, str(k))
-            for j in range(0, n // 2):
-                if j % 2 == 0:
-                    k = random.randint(0, tree.length() - 1)
-                    count += tree.delete(k)
-                else:
-                    k = random.randint(0, tree.length())
-                    count += tree.insert(k, str(k))
-            print("count for i =", i, " is:", count)
-
-    def testq2Part1(self):
-        print("question 2")
-        print("part 3")
-        count = 0
-        for i in range(1, 11):
-            tree = AVLTreeList()
-            n = 1500 * (2 ** i)
-            for j in range(0, n):
-                k = random.randint(0, tree.length())
-                count += tree.insert(0, str(k))
-            print("count for i =", i, " is:", count)
-
-    def testq2Part2(self):
-        print("part 3")
-        count = 0
-        for i in range(1, 11):
-            tree = AVLTreeList()
-            n = 1500 * (2 ** i)
-            for j in range(0, n):
-                k = random.randint(0, tree.length())
-                count += tree.insert(k, str(k))
-            print("count for i =", i, " is:", count)
-
-    def testq2Part3(self):
-        print("part 3")
-        count = 0
-        for i in range(1, 11):
-            tree = AVLTreeList()
-            n = 1500 * (2 ** i)
-            for j in range(0, n):
-                k = random.randint(0, tree.length())
-                count += tree.insert(tree.length(), str(k))
-
-
-tree = AVLTreeList()
-arr = ["a", "b", "c"]
-for i in range(len(arr)):
-    tree.insert(i, arr[i])
-
-tree2 = AVLTreeList()
-arr2 = ["d", "e", "f", "g", "h"]
-for i in range(len(arr2)):
-    tree2.insert(i, arr2[i])
-
-# tree2.inorder(tree2.root)
-tree2.concat(tree)
-tree2.inorder(tree2.root)
-
-##tree = AVLTreeList()
-##tree2 = AVLTreeList()
-##tree2.insert(0,"0")
-##tree2.insert(1,"1")
-##tree2.insert(0,"2")
-##print(tree2.listToArray())
-
-##tree.testq1Part1()
-##tree.testq1Part2()
-##tree.testq1Part3()
-##n = 50
-##mylist = []
-##mylist2 = []
-##for j in range(0, n):
-##    k = random.randint(0, tree.length())
-##    mylist2.insert(j,k)
-##    mylist.insert(k,str(j))
-##    tree.insert(k, str(j))
-##print("correct list")
-##print(mylist)
-##print("my list")
-##print(tree.listToArray())
-##print("indexes")
-##print(mylist2)
-##print(tree.first())
-##print(tree.last())
-
-# 3arr = ["w","a","c","z","d"]
-##for i in range(5):
-##	tree.insert(i,arr[i])
-##for i in range(5):
-##	tree.delete(0)
-##for i in range(4):
-##	tree.delete(0)
-##tree.delete(0)
-##tree.delete(0)
-##tree.delete(0)
-##tree.delete(1)
-##tree.delete(0)
-##print(tree.first())
-##print(tree.last())
-##print(tree.size)
-##tree.delete(0)
-##tree.inorder(tree.sort().root)
-##tree.inorder(tree.permutation().getRoot())
-
-
-##tree2 = tree.permutation()
-##tree2.inorder(tree2.root)
-##print (tree.inorder(tree.root))
-##print (tree.inorder(tree.root))
-##print (tree.inorder(tree.root))
-##tree.delete(0)
-##print(tree.first())
-##print(tree.retrieve(2))
-##tree2 = AVLTreeList()
-##tree2.testq1()
-
-
-# print(tree.search("d"))
-##cnt = tree.insert(3,"F")
-##print(tree.delete(3))
-##print(tree.insert(4,"A"))
-##print(tree.delete(4))
-##tree.inorder(tree.getRoot())
-##tree.inorder(tree.permutation().getRoot())
-##print(cnt)
-##print (tree.retrieve(1))
-
-##print(tree.search("A"))
-##tree.insert(0,"C")
-##tree.inorder(tree.getRoot())
-##tree.delete(0)
-##tree.inorder(tree.sort().getRoot())
