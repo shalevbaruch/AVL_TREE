@@ -13,7 +13,6 @@
 
 
 import random
-
 """A class represnting a node in an AVL tree"""
 
 
@@ -630,37 +629,51 @@ class AVLTreeList(object):
     def joinSTB(self, connecting_node, lst):  # STB == Small To Big
         h1 = self.root.getHeight()
         temp = lst.root
-        while temp.isRealNode() and temp.getHeight() > h1:
-            temp = temp.getLeft()
         tmp_parent = temp.getParent()
+        while temp.isRealNode() and temp.getHeight() > h1:
+            tmp_parent = temp
+            temp = temp.getLeft()
         connecting_node.setLeft(self.root)
         self.root.setParent(connecting_node)
-        connecting_node.setRight(temp)
-        temp.setParent(connecting_node)
-        tmp_parent.setLeft(connecting_node)
-        connecting_node.setParent(tmp_parent)
-        self.Fix_Up_Delete(connecting_node)
-        self.root = lst.root
-        self.lastitem = lst.lastitem
+        if tmp_parent.isRealNode():
+            connecting_node.setRight(temp)
+            if temp.isRealNode():
+                temp.setParent(connecting_node)
+            tmp_parent.setLeft(connecting_node)
+            connecting_node.setParent(tmp_parent)
+            self.root = lst.root
+            self.lastitem = lst.lastitem
+            self.size += lst.size + 1
+            self.Fix_Up_Delete(connecting_node)
+
+        else:
+            connecting_node.setRight(lst.root)
+            lst.root.setParent(connecting_node)
+            self.root = connecting_node
+            connecting_node.setParent(AVLNode.virtual_node)
+            self.lastitem = lst.lastitem
+            self.size += lst.size + 1
+            self.Fix_Up_Delete(connecting_node)
         return None
 
     def joinBTS(self, connecting_node, lst):  # BTS == Big To Small
         h1 = lst.getRoot().getHeight()
         temp = self.getRoot()
-        while temp.isRealNode() and temp.getHeight() > h1:
-            temp = temp.getRight()
         tmp_parent = temp.getParent()
+        while temp.isRealNode() and temp.getHeight() > h1:
+            tmp_parent = temp
+            temp = temp.getRight()
         connecting_node.setRight(lst.getRoot())
         lst.getRoot().setParent(connecting_node)
         connecting_node.setLeft(temp)
-        temp.setParent(connecting_node)
+        if temp.isRealNode():
+            temp.setParent(connecting_node)
         tmp_parent.setRight(connecting_node)
         connecting_node.setParent(tmp_parent)
-        self.Fix_Up_Delete(connecting_node)
         self.lastitem = lst.lastitem
+        self.size += lst.size + 1
+        self.Fix_Up_Delete(connecting_node)
         return
-
-
 
     def concat(self, lst):
         h1 = self.getRoot().getHeight()
@@ -671,11 +684,19 @@ class AVLTreeList(object):
             self.root = lst.root
             self.lastitem = lst.lastitem
             self.firstitem = lst.firstitem
+            self.size = lst.size
             return h2 + 1
         else:
             connecting_node = self.lastitem
             self.delete(self.size - 1)
-            if h1 <= h2:
+            if self.getRoot().getHeight() <= h2:
+                if self.size == 0:
+                    self.root = lst.root
+                    self.lastitem = lst.lastitem
+                    self.firstitem = lst.firstitem
+                    self.insert(0, connecting_node.getValue())
+                    self.size = lst.size + 1
+                    return h2 + 1
                 self.joinSTB(connecting_node, lst)
             else:
                 self.joinBTS(connecting_node, lst)
@@ -814,6 +835,34 @@ class AVLTreeList(object):
             for j in range(0, n):
                 k = random.randint(0, tree.length())
                 count += tree.insert(tree.length(), str(k))
+
+
+
+
+
+
+
+
+tree = AVLTreeList()
+arr = [1,2,3,4]
+for i in range(len(arr)):
+    tree.insert(i, arr[i])
+
+tree2 = AVLTreeList()
+arr2 = [10,11,12,13]
+for i in range(len(arr2)):
+    tree2.insert(i, arr2[i])
+
+tree3 = AVLTreeList()
+arr3 = [20,21,22,23]
+for i in range(len(arr3)):
+    tree3.insert(i,arr3[i])
+
+tree.concat(tree2)
+print(tree.root.getValue())
+tree.concat(tree3)
+tree.inorder(tree.root)
+print(tree.getRoot().getHeight())
 
 
 ##tree = AVLTreeList()
