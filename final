@@ -656,7 +656,6 @@ class AVLTreeList(object):
             self.Fix_Up_Delete(connecting_node)  # maybe connecting_node need to be fixed
         return None
 
-
     def joinBTS(self, connecting_node, lst):  # BTS == Big To Small - self.height > lst.height
         h1 = lst.root.getHeight()
         temp = self.root
@@ -669,13 +668,13 @@ class AVLTreeList(object):
         connecting_node.setLeft(temp)
         if temp.isRealNode():  # need to set parent if temp is not virtual
             temp.setParent(connecting_node)
-            tmp_parent.setRight(connecting_node)
+        tmp_parent.setRight(connecting_node)
         connecting_node.setParent(tmp_parent)
         self.lastitem = lst.lastitem
         self.size += lst.size + 1  # adding +1 because we deleted the connecting_node
-        self.Fix_Up_Delete(connecting_node)  # need to do fix up to the root, while the fix up is same as the fix in delete
+        self.Fix_Up_Delete(
+            connecting_node)  # need to do fix up to the root, while the fix up is same as the fix in delete
         return
-
 
     def concat(self, lst):
         h1 = self.root.getHeight()
@@ -752,7 +751,7 @@ class AVLTreeList(object):
 
     def getRoot(self):
         if self.empty():
-            return None
+            return AVLNode.virtual_node
         return self.root
 
     def inorder(self, Root: AVLNode):
