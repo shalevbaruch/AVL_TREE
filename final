@@ -750,7 +750,7 @@ class AVLTreeList(object):
 
     def getRoot(self):
         if self.empty():
-            return AVLNode.virtual_node
+            return None
         return self.root
 
     def inorder(self, Root: AVLNode):
