@@ -1,4 +1,5 @@
 import random
+import time
 
 
 class AVLNode(object):
@@ -660,8 +661,10 @@ class AVLTreeList(object):
         else:  # lst and self is not empty
             connecting_node = self.lastitem
             self.delete(self.size - 1)
-            if self.root.getHeight() <= h2:  # calling to getHeight again because maybe after the deletion self.height <= h2
-                if self.size == 0:  # if self had only one node at the start, we can convert self to lst and insert the node that we deleted at index 0
+            # calling to getHeight again because maybe after the deletion self.height <= h2
+            if self.root.getHeight() <= h2:
+                if self.size == 0:  # if self had only one node at the start, we can convert self to lst and insert
+                    # the node that we deleted at index 0
                     self.root = lst.root
                     self.lastitem = lst.lastitem
                     self.firstitem = lst.firstitem
@@ -729,23 +732,3 @@ class AVLTreeList(object):
             self.inorder(Root.getLeft())
             print(Root.getValue())
             self.inorder(Root.getRight())
-
-    def testq1Part2(self):
-        print("part 2")
-        count = 0
-        for i in range(1, 11):
-            tree = AVLTreeList()
-            n = 1500 * (2 ** i)
-            for j in range(0, n):
-                k = random.randint(0, tree.length())
-                tree.insert(k, str(k))
-            for j in range(0, n):
-                k = random.randint(0, tree.length() - 1)
-                try:
-                    count += tree.delete(k)
-                except Exception:
-                    print(j)
-            print("count for i =", i, " is:", count)
-
-
-AVLTreeList().testq1Part2()
