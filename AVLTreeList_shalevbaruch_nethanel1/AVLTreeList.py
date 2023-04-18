@@ -1,27 +1,13 @@
-# username - shalevbaruch,nethanel1
+# username - shalevbaruch
 # id1      - 213070477
 # name1    - Shalev Baruch
 # id2      - 214194839
 # name2    - Jonathan Nethanel
-
-
-# username - shalevbaruch,nethanel1
-# id1      - 213070477
-# name1    - Shalev Baruch
-# id2      - 214194839
-# name2    - Jonathan Nethanel
-
 
 import random
 
-"""A class represnting a node in an AVL tree"""
-
 
 class AVLNode(object):
-    """Constructor, you are allowed to add more fields.
-    @type value: str
-    @param value: data of your node
-    """
     virtual_node = None
 
     def __init__(self, value, is_virtual=False):
@@ -221,15 +207,7 @@ class AVLNode(object):
         self.size = self.getLeft().getSize() + self.getRight().getSize() + 1
 
 
-"""
-A class implementing the ADT list, using an AVL tree.
-"""
-
-
 class AVLTreeList(object):
-    """
-    Constructor, you are allowed to add more fields.
-    """
 
     def __init__(self):
         self.size = 0
@@ -338,7 +316,7 @@ class AVLTreeList(object):
             par = AVLNode.virtual_node
 
         else:
-            if (i == 0):
+            if i == 0:
                 index_node = self.firstitem
             else:
                 index_node = self.root.get_node_index(i + 1)
@@ -394,15 +372,10 @@ class AVLTreeList(object):
 
         if y.isRealNode():
             y.setParent(x.getParent())
-        x.setParent(AVLNode.virtual_node)
-        x.setLeft(AVLNode.virtual_node)
-        x.setRight(AVLNode.virtual_node)
 
     def Fix_Up_Delete(self, node: AVLNode):
         cnt = 0
         temp = node
-        ##if ()
-
         while temp.isRealNode():
             temp.recalculate_node_attributes()
             if temp.getRight().isRealNode():
@@ -480,7 +453,7 @@ class AVLTreeList(object):
         if not (node.getLeft().isRealNode()):
             par = node.getParent()
             self.replace(node, node.getRight())
-            if (node.getRight().isRealNode()):
+            if node.getRight().isRealNode():
                 cnt += self.Fix_Up_Delete(par)
             else:
                 self.Fix_Up_Delete(par)
@@ -653,6 +626,7 @@ class AVLTreeList(object):
             self.root = connecting_node
             self.lastitem = lst.lastitem
             self.size += lst.size + 1  # adding +1 because we deleted the connecting_node
+            connecting_node.setParent(AVLNode.virtual_node)
             self.Fix_Up_Delete(connecting_node)  # maybe connecting_node need to be fixed
         return None
 
@@ -690,8 +664,10 @@ class AVLTreeList(object):
         else:  # lst and self is not empty
             connecting_node = self.lastitem
             self.delete(self.size - 1)
-            if self.root.getHeight() <= h2:  # calling to getHeight again because maybe after the deletion self.height <= h2
-                if self.size == 0:  # if self had only one node at the start, we can convert self to lst and insert the node that we deleted at index 0
+            # calling to getHeight again because maybe after the deletion self.height <= h2
+            if self.root.getHeight() <= h2:
+                if self.size == 0:  # if self had only one node at the start, we can convert self to lst and insert
+                    # the node that we deleted at index 0
                     self.root = lst.root
                     self.lastitem = lst.lastitem
                     self.firstitem = lst.firstitem
@@ -753,9 +729,3 @@ class AVLTreeList(object):
         if self.empty():
             return AVLNode.virtual_node
         return self.root
-
-    def inorder(self, Root: AVLNode):
-        if Root.isRealNode():
-            self.inorder(Root.getLeft())
-            print(Root.getValue())
-            self.inorder(Root.getRight())
